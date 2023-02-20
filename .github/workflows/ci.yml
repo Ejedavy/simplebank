@@ -30,14 +30,19 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - name: install migrate
-        run: $ curl -L https://github.com/golang-migrate/migrate/releases/download/$version/migrate.$platform-amd64.tar.gz | tar xvz
+
       - uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
+
+      - name: install migrate
+        run: $ curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-386.tar.gz | tar xvz
+
+      - name: makemigration
+        run: make migrateup
 
       - name: Test
         run: make test
