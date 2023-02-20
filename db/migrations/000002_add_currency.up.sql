@@ -1,0 +1,1 @@
+ALTER TABLE "Account" ADD COLUMN  "currency" varchar NOT NULL;
