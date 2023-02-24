@@ -2,8 +2,11 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	db "simple_bank/db/sqlc"
+	docs "simple_bank/docs"
 )
 
 type Server struct {
@@ -25,13 +28,15 @@ func NewServer(store *db.Store) *Server {
 
 	// Create the routers and register the rout s
 	router := gin.Default()
+
+	docs.SwaggerInfo.BasePath = "/"
 	v1 := router.Group("/api/v1")
 	account := v1.Group("/account")
 	account.POST("/createaccount", server.CreateAccountHandler)
 	account.GET("/getaccount/:id", server.GetAccountByIDHandler)
 	account.GET("/getaccounts", server.GetAccountsHandler)
 	account.PUT("/updateaccount", server.UpdateAccountHandler)
-	account.DELETE("/deleteaccount", server.DeleteAccountHandler)
+	account.DELETE("/deleteaccount/:id", server.DeleteAccountHandler)
 
 	transfer := v1.Group("/transfer")
 	transfer.POST("/initiatetransfer", server.InitiateTransferHandler)
@@ -44,6 +49,8 @@ func NewServer(store *db.Store) *Server {
 	logger.GET("/getentry/:id", server.GetEntryHandler)
 	logger.GET("/listaccountentries", server.GetAccountEntriesHandler)
 	logger.GET("/listBankEntries", server.GetBankEntriesHandler)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	server.router = router
 
