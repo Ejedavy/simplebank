@@ -84,15 +84,47 @@ func (s *Server) GetAccountsHandler(context *gin.Context) {
 }
 
 type UpdateAccountHandlerRequest struct {
+	ID      int64 `json:"id"`
+	Balance int64 `json:"balance"`
 }
 
 func (s *Server) UpdateAccountHandler(context *gin.Context) {
+	var request UpdateAccountHandlerRequest
+	err := context.ShouldBindJSON(&request)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, NewServerError(err))
+		return
+	}
+	account, err := s.store.UpdateAccount(context, db.UpdateAccountParams{
+		ID:      request.ID,
+		Balance: request.Balance,
+	})
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, NewServerError(err))
+		return
+	}
 
+	context.JSON(http.StatusOK, account)
+	return
 }
 
 type DeleteAccountHandlerRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
 func (s *Server) DeleteAccountHandler(context *gin.Context) {
+	var request DeleteAccountHandlerRequest
+	err := context.ShouldBindUri(&request)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, NewServerError(err))
+		return
+	}
 
+	err = s.store.DeleteAccount(context, request.ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, NewServerError(err))
+		return
+	}
+
+	context.JSON(http.StatusOK, struct{}{})
 }

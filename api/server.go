@@ -12,7 +12,7 @@ type Server struct {
 }
 
 type ServerError struct {
-	Error   error  `json: "error"`
+	Error   error  `json:"error"`
 	Message string `json:"message"`
 }
 
@@ -28,7 +28,7 @@ func NewServer(store *db.Store) *Server {
 	v1 := router.Group("/api/v1")
 	account := v1.Group("/account")
 	account.POST("/createaccount", server.CreateAccountHandler)
-	account.GET("getaccount/:id", server.GetAccountByIDHandler)
+	account.GET("/getaccount/:id", server.GetAccountByIDHandler)
 	account.GET("/getaccounts", server.GetAccountsHandler)
 	account.PUT("/updateaccount", server.UpdateAccountHandler)
 	account.DELETE("/deleteaccount", server.DeleteAccountHandler)
